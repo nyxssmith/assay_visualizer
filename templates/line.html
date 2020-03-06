@@ -1,0 +1,84 @@
+{% load staticfiles %}
+<!doctype html>
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+<body>
+{% block content %}
+
+    <div style="width:100%;">
+        <canvas id="myChart"></canvas>
+    </div>
+    <br>
+    <br>
+
+    <b>
+    Importing will import all csvs in the project root directory, this can be done multiple times to create duplicate data and laggy javascript
+    </b>
+    <form action='import_button' method='GET'>
+        <button type='submit'>Import all CSV Data</button>
+    </form>
+
+    <!-- details used to be selections for picking which dates and smiles strings would be shown -->
+    <details>
+        <summary>Smiles String List</summary>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for smile in smiles_list %}
+                <div class="form-check">
+                    <label class="form-check-label" for="{{ smile }}">{{ smile }}</label>
+                </div>
+            {% endfor %}
+
+
+        </form>
+    </details>
+
+    <details>
+        <summary>Dates List</summary>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for date in dates_list %}
+                <div class="form-check">
+                    <label class="form-check-label" for="{{ date }}">{{ date }}</label>
+                </div>
+            {% endfor %}
+
+        </form>
+    </details>
+
+    <p>
+    Change between viewing modes: measured/time or measured/predicted)
+    </p>
+    <form action='mode_button' method='GET'>
+        <button type='submit'>{{ mode_button_text }}</button>
+    </form>
+
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                {{ list_of_dates_ordered }}
+                labels: [
+                    {% for point in x_axis %}
+                        '{{point}}',
+                    {%  endfor %}
+                ],
+                datasets: [{{ datasets }}]
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+    </script>
+{% endblock %}
+
+</body>
+
+</html>

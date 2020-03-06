@@ -1,0 +1,9 @@
+{
+  "db": "db",
+  "db_addr": "192.168.1.151",
+  "db_user": "user",
+  "db_password": "password",
+  "db_root_user": "root",
+  "db_root_password": "password",
+  "x_axis_limit": -1
+}
