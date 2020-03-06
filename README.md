@@ -9,6 +9,7 @@ First see configuration and change `db_addr` to your machines local ip
 To start, run
 ```docker-compose -f docker-compose.yml up -d```
 It takes a second for the mysql database to start, if the application is loaded (visit [127.0.0.1:8000](127.0.0.1:8000)) during that time, it may throw an error. This is fine, just wait a sec then reload the page
+
 Once its loaded, click the "Import all CSV Data" and the page will reload
 ## Configuration
 - The mysql settings of the local database can be changed in the `docker-compose.yml` file
