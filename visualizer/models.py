@@ -6,11 +6,10 @@ import csv
 import copy
 import uuid
 
+
 # Create your models here.
 
 class db_connection(models.Model):
-
-    # TODO make its host correct to internal docker network
 
     def get_all_smiles(self):
 
@@ -41,16 +40,15 @@ class db_connection(models.Model):
 
         return measured_list, predicted_list
 
-    def get_measured_vs_date_lists_for_assay(self,assay_int):
+    def get_measured_vs_date_lists_for_assay(self, assay_int):
         sql_cmd = "select assay_{} from assays;".format(assay_int)
 
         measured_list = self.run_sql(sql_cmd)
 
         date_list = self.get_all_dates()
-        return measured_list,date_list
+        return measured_list, date_list
 
-    def make_x_and_y_axis_for_chart(self,measured_list,predicted_list):
-
+    def make_x_and_y_axis_for_chart(self, measured_list, predicted_list):
 
         x_axis = []
         for result in measured_list:
@@ -59,7 +57,6 @@ class db_connection(models.Model):
             else:
                 x_axis.append("AssayNotRan")
 
-
         y_axis = []
         for result in predicted_list:
             if result[0]:
@@ -67,28 +64,27 @@ class db_connection(models.Model):
             else:
                 y_axis.append('null_ph')
 
-        return x_axis,y_axis
+        return x_axis, y_axis
 
     def get_chart_data_measured_vs_predicted(self, assay_int):
-        measured_list,predicted_list = self.get_measured_vs_predicted_lists_for_assay(assay_int=assay_int)
-        x_axis,y_axis = self.make_x_and_y_axis_for_chart(measured_list,predicted_list)
+        measured_list, predicted_list = self.get_measured_vs_predicted_lists_for_assay(assay_int=assay_int)
+        x_axis, y_axis = self.make_x_and_y_axis_for_chart(measured_list, predicted_list)
 
-        return x_axis,y_axis
+        return x_axis, y_axis
 
-    def format_datelist_for_chart(self,datelist):
+    def format_datelist_for_chart(self, datelist):
         x_axis = []
         for date in datelist:
             x_axis.append(str(date[0]))
         return x_axis
 
     def get_chart_data_measured_vs_time(self, assay_int):
-        measured_list,date_list = self.get_measured_vs_date_lists_for_assay(assay_int=assay_int)
+        measured_list, date_list = self.get_measured_vs_date_lists_for_assay(assay_int=assay_int)
 
-        y_axis,not_used =self.make_x_and_y_axis_for_chart(measured_list,measured_list)
+        y_axis, not_used = self.make_x_and_y_axis_for_chart(measured_list, measured_list)
         x_axis = self.format_datelist_for_chart(date_list)
 
-        return x_axis,y_axis
-
+        return x_axis, y_axis
 
     def generate_insert_sql_cmd(self, csv_row):
         """
@@ -113,13 +109,13 @@ class db_connection(models.Model):
                     cols_to_use.pop(i)
             elif i == 2:
                 # convert date to mysql friendly format
-                date_list = csv_row[i].split('/')# m d y
-                date_list.insert(0,date_list[2])
-                date_list.pop()# y m d
+                date_list = csv_row[i].split('/')  # m d y
+                date_list.insert(0, date_list[2])
+                date_list.pop()  # y m d
                 values.append('"' + '-'.join(date_list) + '"')
             elif i == 0:
                 smiles_uuid = str(uuid.uuid4())[:6]
-                values.append('"' + csv_row[i].replace(' ', '') +smiles_uuid+ '"')
+                values.append('"' + csv_row[i].replace(' ', '') + smiles_uuid + '"')
             else:
                 values.append('"' + csv_row[i].replace(' ', '') + '"')
 
@@ -127,10 +123,8 @@ class db_connection(models.Model):
         cmd = "INSERT INTO assays(" + ",".join(cols_to_use) + ") VALUES(" + ",".join(values) + ");"
         return cmd
 
-    # TODO make callable maybe upload via site? or load all csvs in dir
     def import_csv(self):
         print("importing all csv files to db")
-        #TODO open any csv file in immediate dir
         files = os.listdir(os.getcwd())
         for file in files:
             if ".csv" in file:
@@ -147,10 +141,8 @@ class db_connection(models.Model):
                             except:
                                 print("sql fialed")
                             print(result)
-                            # TODO make it exectute via a generic execute a cmd method
                         row_num += 1
         return
-
 
     def run_sql(self, sql_cmd):
         """
@@ -198,7 +190,6 @@ class db_connection(models.Model):
             );"""
         result = cursor.execute(sql_cmd)
 
-
     def get_db(self):
         with open('config.json') as json_file:
             config = json.load(json_file)
@@ -242,7 +233,7 @@ class db_connection(models.Model):
         self.db_root_user = self.get_db_root_user()
         self.db_root_password = self.get_db_root_password()
         self.connection = self.get_connection()
-        # TODO make actulyy check
+        # TODO make actually check and not just try/fail
         try:
             self.create_table_if_not_exists()
             print("table didnt exist, creating it")

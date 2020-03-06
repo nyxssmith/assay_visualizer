@@ -21,5 +21,4 @@ urlpatterns = [
     path('', views.line, name='index'),
     path('import_button',views.import_button_click),
     path('mode_button',views.mode_button_click),
-    #path('get_selections',views.get_selections),
 ]
